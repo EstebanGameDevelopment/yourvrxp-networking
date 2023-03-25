@@ -9,10 +9,14 @@ using Mirror;
 #if (ENABLE_OCULUS || ENABLE_OPENXR || ENABLE_ULTIMATEXR)
 using yourvrexperience.VR;
 #endif
+#if ENABLE_ULTIMATEXR
+using UltimateXR.Manipulation;
+#endif
 
 namespace yourvrexperience.Networking
 {
-	public class NetworkPickable : NetworkPrefab, INetworkObject, IPickableObject
+	[RequireComponent(typeof(ObjectPickable))]
+	public class NetworkPickable : NetworkPrefab, INetworkObject, INetworkPickable
 	{
 		public const string EventNetworkPickableTakeControl = "EventNetworkPickableTakeControl";
 		public const string EventNetworkPickableTakeControlConfirmation = "EventNetworkPickableTakeControlConfirmation";
@@ -21,16 +25,14 @@ namespace yourvrexperience.Networking
 
 		public const string EventNetworkPickableRefreshTransform = "EventNetworkPickableRefreshTransform";
 
-		[SerializeField] protected float grabbedObjectDistance = 1; 
-
 		protected bool _enabled = true;
 		protected bool _requestedOwnership = false;
 
-		protected Collider _collider;
-		protected Rigidbody _rigidBody;
 		protected int _layer;
 		private float _restoreServerAuthority = 0;
         		
+		protected IObjectPickable _objectPickable;
+
 		public override bool LinkedToCurrentLevel
 		{
 			get { return true; }
@@ -41,18 +43,12 @@ namespace yourvrexperience.Networking
 			base.Start();
 
 			_layer = this.gameObject.layer;
-			_collider = this.GetComponent<Collider>();
-			_rigidBody = this.GetComponent<Rigidbody>();
+			_objectPickable = this.GetComponent<IObjectPickable>();
+			_objectPickable.PickedEvent += OnPickedEvent;
 
 			if (!IsInLevel)
 			{
 				bool shouldActivate = true;
-#if ENABLE_MIRROR
-				if (NetworkController.Instance.IsServer)
-				{
-					NetworkGameIDView.RefreshAuthority();
-				}				
-#endif							
 				NetworkGameIDView.InitedEvent += OnInitDataEvent;
 				shouldActivate = NetworkGameIDView.AmOwner();
 			}
@@ -65,7 +61,13 @@ namespace yourvrexperience.Networking
 			if (!IsInLevel)
 			{
 				NetworkGameIDView.InitedEvent -= OnInitDataEvent;
+				_objectPickable.PickedEvent -= OnPickedEvent;
 			}
+		}
+
+		private void OnPickedEvent(bool isGrabbed)
+		{
+			ToggleControl();
 		}
 
 		public virtual void SetInitData(string initializationData)
@@ -79,12 +81,10 @@ namespace yourvrexperience.Networking
 
 		public virtual void ActivatePhysics(bool activation, bool force = false)
 		{
-			if (_enabled || force)
-			{
-				_rigidBody.useGravity = activation;
-				_rigidBody.isKinematic = !activation;
-				_collider.isTrigger = !activation;
-			}
+            if (_enabled || force)
+            {
+				_objectPickable.ActivatePhysics(activation);
+            }
 		}
 
 		protected override void OnNetworkEvent(string nameEvent, int originNetworkID, int targetNetworkID, object[] parameters)
@@ -162,7 +162,7 @@ namespace yourvrexperience.Networking
 
 		protected virtual void ReportedConfirmationOfOwnerShip()
 		{
-			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPickableTakeControlConfirmation, this);
+			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPickableTakeControlConfirmation, _objectPickable);
 		}
 
 		protected virtual void ReportReleaseConfirmation()
@@ -196,35 +196,6 @@ namespace yourvrexperience.Networking
 			return true;
 		}
 
-		protected Vector3 GetPositionRaycastAgainstSurface(int layerMaskSurface, ref RaycastHit hitData)
-		{
-#if (ENABLE_OCULUS || ENABLE_OPENXR || ENABLE_ULTIMATEXR)
-			Vector3 positionController = VRInputController.Instance.VRController.CurrentController.transform.position;
-			Vector3 forwardController = VRInputController.Instance.VRController.CurrentController.transform.forward;
-
-			Vector3 positionPlacement = RaycastingTools.GetRaycastOriginForward(positionController, forwardController, ref hitData, 10000, layerMaskSurface);
-#else
-			Vector3 positionPlacement = RaycastingTools.GetMouseCollisionPoint(Camera.main, ref hitData, layerMaskSurface);
-#endif
-			return positionPlacement;
-		}		
-
-		protected virtual void MoveToPosition()
-		{
-			Vector3 positionController = Camera.main.transform.position;
-			Vector3 forwardController = Camera.main.transform.forward;
-#if (ENABLE_OCULUS || ENABLE_OPENXR || ENABLE_ULTIMATEXR)
-			positionController = VRInputController.Instance.VRController.CurrentController.transform.position;
-			forwardController = VRInputController.Instance.VRController.CurrentController.transform.forward;
-#endif
-
-			if (NetworkGameIDView.AmOwner())
-			{
-				Vector3 nextPosition = positionController + forwardController * grabbedObjectDistance;
-				this.transform.position = nextPosition;
-			}
-		}
-
 		protected virtual bool RestoreServerAuthority()
 		{
 			if (NetworkController.Instance.IsServer)
@@ -255,7 +226,11 @@ namespace yourvrexperience.Networking
 			{
 				if (!_enabled)
 				{
-					MoveToPosition();
+					_objectPickable.IsGrabbed = true;
+				}
+				else
+				{
+					_objectPickable.IsGrabbed = false;
 				}
 			}
 			AfterUpdate();

@@ -106,7 +106,7 @@ namespace yourvrexperience.Networking
 				NetworkController.Instance.DispatchEvent(EventNetworkPrefabHasStarted, this.gameObject, IsInLevel, NetworkPrefabName, NetworkPathName);
 				if (NetworkController.Instance.IsServer)
 				{
-					NetworkGameIDView.RequestAuthority();
+					Invoke("DelayedRequestAuthority", 0.3f);
 				}
 			}
 			else
@@ -115,6 +115,11 @@ namespace yourvrexperience.Networking
 			}
 
 			NetworkController.Instance.NetworkEvent += OnNetworkEvent;
+		}
+
+		private void DelayedRequestAuthority()
+		{
+			NetworkGameIDView.RequestAuthority();
 		}
 
 		public bool GetIsInLevel()

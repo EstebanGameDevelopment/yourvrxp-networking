@@ -12,7 +12,7 @@ using yourvrexperience.VR;
 
 namespace yourvrexperience.Networking
 {
-	public class NetworkAttachableObject : NetworkPickable, INetworkObject, IPickableObject
+	public class NetworkAttachableObject : NetworkPickable, INetworkObject, INetworkPickable
 	{
 		public const string EventNetworkAttachableObjectReset = "EventNetworkAttachableObjectReset";
 
