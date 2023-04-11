@@ -104,10 +104,12 @@ namespace yourvrexperience.Networking
 			if (!IsInLevel)
 			{
 				NetworkController.Instance.DispatchEvent(EventNetworkPrefabHasStarted, this.gameObject, IsInLevel, NetworkPrefabName, NetworkPathName);
+#if ENABLE_MIRROR				
 				if (NetworkController.Instance.IsServer)
 				{
 					Invoke("DelayedRequestAuthority", 0.3f);
 				}
+#endif				
 			}
 			else
 			{

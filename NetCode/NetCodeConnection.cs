@@ -88,6 +88,7 @@ namespace yourvrexperience.Networking
 				if ((int)netObject.OwnerClientId != newOwnerID)
 				{
 					netObject.ChangeOwnership((ulong)newOwnerID);
+					NetworkController.Instance.DispatchNetworkEvent(NetworkObjectID.EventNetworkObjectIDTransferOwnership, -1, -1, (int)networkID, (int)newOwnerID);
 				}
 			}
 		}

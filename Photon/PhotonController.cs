@@ -299,7 +299,8 @@ namespace yourvrexperience.Networking
                 networkInstance = PhotonNetwork.Instantiate(pathToPrefab, position, rotation, data);
             }
             networkInstance.name = uniqueNetworkName;
-			networkInstance.GetComponent<NetworkObjectID>().NameObject = uniqueNetworkName;			
+			networkInstance.GetComponent<NetworkObjectID>().NameObject = uniqueNetworkName;		
+            NetworkController.Instance.DelayNetworkEvent(NetworkObjectID.EventNetworkObjectIDIdentity, 0.2f, -1, -1, networkInstance.GetComponent<NetworkObjectID>().GetOwnerID(), networkInstance.GetComponent<NetworkObjectID>().GetViewID(), networkInstance.GetComponent<NetworkObjectID>().GetIndexPrefab(), networkInstance.GetComponent<NetworkObjectID>().NameObject, NetworkController.Instance.IsMultipleScene, this.transform.position, this.transform.rotation);	
             Utilities.FixObject(networkInstance);
 			if (_dontDestroyOnLoad)
 			{

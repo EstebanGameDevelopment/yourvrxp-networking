@@ -424,6 +424,7 @@ namespace yourvrexperience.Networking
 			if (!AmOwner())
 			{
 				PhotonController.Instance.TransferOwnership(this.GetComponent<PhotonView>());
+				NetworkController.Instance.DelayNetworkEvent(EventNetworkObjectIDTransferOwnership, 0.2f, -1, -1, GetViewID(), NetworkController.Instance.UniqueNetworkID);
 			}		
 #elif ENABLE_NAKAMA
 			if (!AmOwner())
@@ -496,7 +497,7 @@ namespace yourvrexperience.Networking
 					this.GetComponent<NakamaIdentity>().Owner = (int)parameters[1];
 #elif ENABLE_SOCKETS
 					this.GetComponent<SocketIdentity>().Owner = (int)parameters[1];
-#elif ENABLE_MIRROR
+#elif ENABLE_MIRROR 
 					Owner = (int)parameters[1];
 #endif			
 
@@ -528,7 +529,7 @@ namespace yourvrexperience.Networking
 					{
 						this.GetComponent<INetworkObject>().ActivatePhysics(false);
 						string nameObject = (string)parameters[3];
-						NameObject = nameObject;						
+						NameObject = nameObject;		
 						bool dontDestroyOnLoad = (bool)parameters[4];
 						this.transform.position = (Vector3)parameters[5];
 						this.transform.rotation = (Quaternion)parameters[6];
