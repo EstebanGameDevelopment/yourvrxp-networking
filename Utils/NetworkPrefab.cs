@@ -19,6 +19,9 @@ namespace yourvrexperience.Networking
 	{
 		public const string EventNetworkPrefabHasStarted = "EventNetworkPrefabHasStarted";
 		public const string EventNetworkPrefabUpdateNameObject = "EventNetworkPrefabUpdateNameObject";
+		public const string EventNetworkPrefabRefreshTransform = "EventNetworkPrefabRefreshTransform";
+		public const string EventNetworkPrefabTakeControlConfirmation = "EventNetworkPrefabTakeControlConfirmation";
+		public const string EventNetworkPrefabObjectReleasedControlConfirmed = "EventNetworkPrefabObjectReleasedControlConfirmed";
 
 		public const string Separator = "<np>";
 
@@ -28,7 +31,9 @@ namespace yourvrexperience.Networking
 
 		private Rigidbody _networkRigidBody;
 		private Collider _networkCollider;
-				
+		protected bool _requestedOwnership = false;
+		protected float _restoreServerAuthority = 0;
+
 		private NetworkObjectID _networkGameID;
 		public NetworkObjectID NetworkGameIDView
 		{
@@ -104,12 +109,12 @@ namespace yourvrexperience.Networking
 			if (!IsInLevel)
 			{
 				NetworkController.Instance.DispatchEvent(EventNetworkPrefabHasStarted, this.gameObject, IsInLevel, NetworkPrefabName, NetworkPathName);
-#if ENABLE_MIRROR				
-				if (NetworkController.Instance.IsServer)
-				{
-					Invoke("DelayedRequestAuthority", 0.3f);
-				}
-#endif				
+#if ENABLE_MIRROR
+                if (NetworkController.Instance.IsServer)
+                {
+                    NetworkGameIDView.Owner = -1;
+                }
+#endif                				
 			}
 			else
 			{
@@ -117,11 +122,6 @@ namespace yourvrexperience.Networking
 			}
 
 			NetworkController.Instance.NetworkEvent += OnNetworkEvent;
-		}
-
-		private void DelayedRequestAuthority()
-		{
-			NetworkGameIDView.RequestAuthority();
 		}
 
 		public bool GetIsInLevel()
@@ -134,8 +134,82 @@ namespace yourvrexperience.Networking
 			if (NetworkController.Instance != null)	NetworkController.Instance.NetworkEvent -= OnNetworkEvent;
 		}
 
+		protected virtual void ReportedConfirmationOfOwnerShip()
+		{
+			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPrefabTakeControlConfirmation, this.gameObject);
+		}
+
+		protected virtual void ReportReleaseConfirmation()
+		{
+			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPrefabObjectReleasedControlConfirmed);
+		}
+
+		public virtual void RequestAuthority()
+		{
+			if (!NetworkGameIDView.AmOwner())
+			{
+				_requestedOwnership = true;
+				NetworkGameIDView.RequestAuthority();
+			}
+			else
+			{
+				ReportedConfirmationOfOwnerShip();
+			} 		
+		}
+
+		public virtual void ReleaseAuthority()
+		{
+			if (NetworkController.Instance.IsServer)
+			{
+				_restoreServerAuthority = 0.2f;
+			}	
+			ReportReleaseConfirmation();
+        }
+
 		protected virtual void OnNetworkEvent(string nameEvent, int originNetworkID, int targetNetworkID, object[] parameters)
 		{
+			if (nameEvent.Equals(NetworkObjectID.EventNetworkObjectIDTransferCompletedOwnership))
+			{
+				int targetNetID = (int)parameters[0];
+				if (NetworkGameIDView.GetViewID() == targetNetID)
+				{
+					if (NetworkGameIDView.AmOwner())
+					{
+						if (_requestedOwnership)
+						{
+							_requestedOwnership = false;
+							ReportedConfirmationOfOwnerShip();
+						}
+					}					
+				}
+			}
+			if (nameEvent.Equals(NetworkObjectID.EventNetworkObjectIDOwnershipOfServer))			
+			{
+				int targetNetID = (int)parameters[0];
+				if (NetworkGameIDView.GetViewID() == targetNetID)
+				{
+					if (NetworkGameIDView.AmOwner())
+					{
+						NetworkController.Instance.DispatchNetworkEvent(EventNetworkPrefabRefreshTransform, -1, -1, NetworkGameIDView.GetViewID(), this.transform.position, this.transform.rotation, this.transform.localScale);
+#if ENABLE_MIRROR						
+						NetworkController.Instance.DelayNetworkEvent(EventNetworkPrefabRefreshTransform, 0.2f, -1, -1, NetworkGameIDView.GetViewID(), this.transform.position, this.transform.rotation, this.transform.localScale);
+#endif						
+					}					
+				}
+			}	
+			if (nameEvent.Equals(EventNetworkPrefabRefreshTransform))
+			{
+				int targetNetID = (int)parameters[0];
+				if (NetworkGameIDView.GetViewID() == targetNetID)
+				{
+					if (!NetworkGameIDView.AmOwner())
+					{
+						this.transform.position = (Vector3)parameters[1];
+						this.transform.rotation = (Quaternion)parameters[2];
+						this.transform.localScale = (Vector3)parameters[3];
+					}					
+				}
+			}
 			if (nameEvent.Equals(NetworkController.EventNetworkControllerClientLevelReady))
 			{
 				if (NetworkController.Instance.IsServer)
@@ -158,6 +232,35 @@ namespace yourvrexperience.Networking
 					}
 				}
 			}
+		}
+
+		protected virtual bool RestoreServerAuthority()
+		{
+			if (NetworkController.Instance.IsServer)
+			{
+				if (_restoreServerAuthority > 0)
+				{
+					_restoreServerAuthority -= Time.deltaTime;
+					if (_restoreServerAuthority <= 0)
+					{
+						if (!NetworkGameIDView.AmOwner())
+						{
+							NetworkGameIDView.RequestAuthority();
+						}
+						else
+						{
+							NetworkController.Instance.DispatchNetworkEvent(NetworkObjectID.EventNetworkObjectIDOwnershipOfServer, -1, -1, NetworkGameIDView.GetViewID());
+						}
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		protected virtual void Update()
+		{
+			RestoreServerAuthority();
 		}
 	}
 }

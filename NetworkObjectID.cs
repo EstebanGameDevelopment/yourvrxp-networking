@@ -371,11 +371,11 @@ namespace yourvrexperience.Networking
         public void Destroy()
         {
 #if ENABLE_PHOTON
-            if ((PhotonView != null) && PhotonView.IsMine) PhotonNetwork.Destroy(PhotonView);
+            if (PhotonView != null) PhotonNetwork.Destroy(PhotonView);
 #elif ENABLE_MIRROR
-            if ((MirrorView != null) && IsMine()) MirrorController.Instance.Connection.CmdDestroy(MirrorView);
+            if (MirrorView != null) MirrorController.Instance.Connection.CmdDestroy(MirrorView);
 #elif ENABLE_NETCODE
-            if ((NetCodeView != null) && IsMine()) NetCodeController.Instance.Connection.DestroyServerRpc((int)NetCodeView.NetworkObjectId);
+            if (NetCodeView != null) NetCodeController.Instance.Connection.DestroyServerRpc((int)NetCodeView.NetworkObjectId);
 #else
 			GameObject.Destroy(this.gameObject);
 #endif

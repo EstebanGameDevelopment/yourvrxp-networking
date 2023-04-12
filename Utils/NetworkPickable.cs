@@ -19,17 +19,11 @@ namespace yourvrexperience.Networking
 	public class NetworkPickable : NetworkPrefab, INetworkObject, INetworkPickable
 	{
 		public const string EventNetworkPickableTakeControl = "EventNetworkPickableTakeControl";
-		public const string EventNetworkPickableTakeControlConfirmation = "EventNetworkPickableTakeControlConfirmation";
 		public const string EventNetworkPickableReleaseControl = "EventNetworkPickableReleaseControl";
-		public const string EventNetworkPickableObjectReleasedControlConfirmed = "EventNetworkPickableObjectReleasedControlConfirmed";
-
-		public const string EventNetworkPickableRefreshTransform = "EventNetworkPickableRefreshTransform";
 
 		protected bool _enabled = true;
-		protected bool _requestedOwnership = false;
 
 		protected int _layer;
-		private float _restoreServerAuthority = 0;
         		
 		protected IObjectPickable _objectPickable;
 
@@ -44,7 +38,6 @@ namespace yourvrexperience.Networking
 
 			_layer = this.gameObject.layer;
 			_objectPickable = this.GetComponent<IObjectPickable>();
-			_objectPickable.PickedEvent += OnPickedEvent;
 
 			if (!IsInLevel)
 			{
@@ -61,13 +54,7 @@ namespace yourvrexperience.Networking
 			if (!IsInLevel)
 			{
 				NetworkGameIDView.InitedEvent -= OnInitDataEvent;
-				_objectPickable.PickedEvent -= OnPickedEvent;
 			}
-		}
-
-		private void OnPickedEvent(bool isGrabbed)
-		{
-			ToggleControl();
 		}
 
 		public virtual void SetInitData(string initializationData)
@@ -109,80 +96,17 @@ namespace yourvrexperience.Networking
 					_enabled = true;
 					this.gameObject.layer = _layer;
 					ActivatePhysics(true);
-					if (NetworkController.Instance.IsServer)
-					{
-						_restoreServerAuthority = 0.2f;
-					}					
-					ReportReleaseConfirmation();
+					ReleaseAuthority();					
 				}
 			}			
-			if (nameEvent.Equals(NetworkObjectID.EventNetworkObjectIDTransferCompletedOwnership))
-			{
-				int targetNetID = (int)parameters[0];
-				if (NetworkGameIDView.GetViewID() == targetNetID)
-				{
-					if (NetworkGameIDView.AmOwner())
-					{
-						if (_requestedOwnership)
-						{
-							_requestedOwnership = false;
-							ReportedConfirmationOfOwnerShip();
-						}
-					}					
-				}
-			}
-			if (nameEvent.Equals(NetworkObjectID.EventNetworkObjectIDOwnershipOfServer))			
-			{
-				int targetNetID = (int)parameters[0];
-				if (NetworkGameIDView.GetViewID() == targetNetID)
-				{
-					if (NetworkGameIDView.AmOwner())
-					{
-						NetworkController.Instance.DispatchNetworkEvent(EventNetworkPickableRefreshTransform, -1, -1, NetworkGameIDView.GetViewID(), this.transform.position, this.transform.rotation, this.transform.localScale);
-#if ENABLE_MIRROR						
-						NetworkController.Instance.DelayNetworkEvent(EventNetworkPickableRefreshTransform, 0.2f, -1, -1, NetworkGameIDView.GetViewID(), this.transform.position, this.transform.rotation, this.transform.localScale);
-#endif						
-					}					
-				}
-			}	
-			if (nameEvent.Equals(EventNetworkPickableRefreshTransform))
-			{
-				int targetNetID = (int)parameters[0];
-				if (NetworkGameIDView.GetViewID() == targetNetID)
-				{
-					if (!NetworkGameIDView.AmOwner())
-					{
-						this.transform.position = (Vector3)parameters[1];
-						this.transform.rotation = (Quaternion)parameters[2];
-						this.transform.localScale = (Vector3)parameters[3];
-					}					
-				}
-			}
-		}
-
-		protected virtual void ReportedConfirmationOfOwnerShip()
-		{
-			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPickableTakeControlConfirmation, _objectPickable);
-		}
-
-		protected virtual void ReportReleaseConfirmation()
-		{
-			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPickableObjectReleasedControlConfirmed);
 		}
 
 		public virtual bool ToggleControl()
 		{
+			_objectPickable.ToggleControl();
 			if (_enabled)
 			{
-				if (!NetworkGameIDView.AmOwner())
-				{
-					_requestedOwnership = true;
-					NetworkGameIDView.RequestAuthority();
-				}
-				else
-				{
-					ReportedConfirmationOfOwnerShip();
-				} 
+				RequestAuthority();
 				NetworkController.Instance.DispatchNetworkEvent(EventNetworkPickableTakeControl, -1, -1, NetworkGameIDView.GetViewID());
 			}
 			else
@@ -196,32 +120,10 @@ namespace yourvrexperience.Networking
 			return true;
 		}
 
-		protected virtual bool RestoreServerAuthority()
+		protected override void Update()
 		{
-			if (NetworkController.Instance.IsServer)
-			{
-				if (_restoreServerAuthority > 0)
-				{
-					_restoreServerAuthority -= Time.deltaTime;
-					if (_restoreServerAuthority <= 0)
-					{
-						if (!NetworkGameIDView.AmOwner())
-						{
-							NetworkGameIDView.RequestAuthority();
-						}
-						else
-						{
-							NetworkController.Instance.DispatchNetworkEvent(NetworkObjectID.EventNetworkObjectIDOwnershipOfServer, -1, -1, NetworkGameIDView.GetViewID());
-						}
-						return true;
-					}
-				}
-			}
-			return false;
-		}
+			base.Update();
 
-		protected virtual void Update()
-		{
 			if (NetworkGameIDView.AmOwner())
 			{
 				if (!_enabled)
@@ -234,9 +136,8 @@ namespace yourvrexperience.Networking
 				}
 			}
 			AfterUpdate();
-			RestoreServerAuthority();
 		}
 
 		public virtual void AfterUpdate(){}
-	}
+    }
 }

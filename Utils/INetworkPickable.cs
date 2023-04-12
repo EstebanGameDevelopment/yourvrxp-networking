@@ -9,5 +9,8 @@ namespace yourvrexperience.Networking
 	public interface INetworkPickable
 	{
 		bool ToggleControl();
+		void RequestAuthority();
+		void ReleaseAuthority();
+		void ActivatePhysics(bool activation, bool force = false);
 	}
 }
