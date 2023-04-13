@@ -21,13 +21,13 @@ namespace yourvrexperience.Networking
 		{
 			if (IsLocalPlayer)
 			{
-				SystemEventController.Instance.DelaySystemEvent(NetCodeController.EventNetcodeControllerLocalConnection, 0.2f, this, (int)NetworkObjectId);
+				SystemEventController.Instance.DispatchSystemEvent(NetCodeController.EventNetcodeControllerLocalConnection, this, (int)NetworkObjectId);
 			}
 			else
 			{
 				SystemEventController.Instance.DelaySystemEvent(NetCodeController.EventNetcodeControllerNewClientConnection,  0.2f, (int)NetworkObjectId);
 			}
-			SystemEventController.Instance.Event += OnSystemEvent;
+			SystemEventController.Instance.Event += OnSystemEvent;			
 		}
 
 		private NetworkObject GetNetworkObject(int networkID)

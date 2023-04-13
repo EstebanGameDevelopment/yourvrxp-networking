@@ -32,6 +32,7 @@ namespace yourvrexperience.Networking
     MonoBehaviour
 #endif
     {
+		public const string EventNetworkObjectIDRequestStart = "EventNetworkObjectIDRequestStart";
 		public const string EventNetworkObjectIDStarted = "EventNetworkObjectIDStarted";
 		public const string EventNetworkObjectIDIdentity = "EventNetworkObjectIDIdentity";
 		public const string EventNetworkObjectIDRequestData = "EventNetworkObjectIDRequestData";
@@ -61,6 +62,7 @@ namespace yourvrexperience.Networking
 		private float _requestedTime = -1;
 
 		private string _nameObject = null;
+		private string _nameConfirmationObject = null;
 
 		public string InitialInstantiationData
 		{
@@ -81,10 +83,12 @@ namespace yourvrexperience.Networking
 			set { 
 				_nameObject = value; 
 				this.gameObject.name = _nameObject;
-#if !ENABLE_PHOTON				
-				SystemEventController.Instance.DelaySystemEvent(EventNetworkObjectIDStarted, 0.1f, _nameObject, this);
-#endif				
 			}
+		}
+		public string NameConfirmationObject
+		{
+			get { return _nameConfirmationObject; }
+			set { _nameConfirmationObject = value; }
 		}
 
 #if ENABLE_AVATAR_OCULUS
@@ -218,14 +222,11 @@ namespace yourvrexperience.Networking
 		{
 			if (NetworkController.Instance != null) NetworkController.Instance.NetworkEvent += OnNetworkEvent;
 			SystemEventController.Instance.Event += OnSystemEvent;
-#if ENABLE_PHOTON
-			SystemEventController.Instance.DelaySystemEvent(EventNetworkObjectIDStarted, 0.3f, _nameObject, this);
-#endif				
+			NetworkController.Instance.DelayNetworkEvent(EventNetworkObjectIDRequestStart, 0.1f, -1, -1, GetViewID(), NetworkController.Instance.IsServer);
 		}
 
 		void OnDestroy()
-		{
-			
+		{			
 			if (SystemEventController.Instance != null)
 			{
 				SystemEventController.Instance.Event -= OnSystemEvent;
@@ -371,11 +372,11 @@ namespace yourvrexperience.Networking
         public void Destroy()
         {
 #if ENABLE_PHOTON
-            if (PhotonView != null) PhotonNetwork.Destroy(PhotonView);
+			if ((PhotonView != null) && PhotonView.IsMine) PhotonNetwork.Destroy(PhotonView);
 #elif ENABLE_MIRROR
-            if (MirrorView != null) MirrorController.Instance.Connection.CmdDestroy(MirrorView);
+			if (MirrorView != null) MirrorController.Instance.Connection.CmdDestroy(MirrorView);
 #elif ENABLE_NETCODE
-            if (NetCodeView != null) NetCodeController.Instance.Connection.DestroyServerRpc((int)NetCodeView.NetworkObjectId);
+			if (NetCodeView != null) NetCodeController.Instance.Connection.DestroyServerRpc((int)NetCodeView.NetworkObjectId);
 #else
 			GameObject.Destroy(this.gameObject);
 #endif
@@ -449,6 +450,17 @@ namespace yourvrexperience.Networking
 
 		private void OnNetworkEvent(string nameEvent, int originNetworkID, int targetNetworkID, object[] parameters)
 		{
+			if (nameEvent.Equals(EventNetworkObjectIDRequestStart))
+			{
+				if (NetworkController.Instance.IsServer)
+				{
+					int targetNetID = (int)parameters[0];
+					if (GetViewID() == targetNetID)
+					{
+						NetworkController.Instance.DispatchNetworkEvent(EventNetworkObjectIDIdentity, -1, -1, GetOwnerID(), GetViewID(), GetIndexPrefab(), NameObject, NetworkController.Instance.IsMultipleScene);
+					}
+				}
+			}
 			if (nameEvent.Equals(EventNetworkObjectIDRequestData))
 			{
 				int targetNetID = (int)parameters[0];
@@ -479,7 +491,6 @@ namespace yourvrexperience.Networking
 			{
 				if (AmOwner())	
 				{
-					// this.gameObject.transform.position += new Vector3(0, 0.01f, 0);
 #if ENABLE_MIRROR					
 					if (this.GetComponent<NetworkTransform>() != null)
 					{
@@ -508,16 +519,6 @@ namespace yourvrexperience.Networking
 					NetworkController.Instance.DispatchEvent(EventNetworkObjectIDTransferCompletedOwnership, targetNetID);
 				}
 			}
-			if (nameEvent.Equals(NetworkController.EventNetworkControllerClientLevelReady))
-			{
-				if (NameObject != null)
-				{
-					if (NameObject.Length > 0)
-					{
-						NetworkController.Instance.DispatchNetworkEvent(EventNetworkObjectIDIdentity, -1, -1, GetOwnerID(), GetViewID(), GetIndexPrefab(), NameObject, NetworkController.Instance.IsMultipleScene, this.transform.position, this.transform.rotation);
-					}
-				}
-			}
 			if (nameEvent.Equals(EventNetworkObjectIDIdentity))
 			{
 				int owner = (int)parameters[0];
@@ -525,28 +526,29 @@ namespace yourvrexperience.Networking
 				int indexPrefab = (int)parameters[2];
 				if (netID == GetViewID())
 				{					
-					if (NameObject == null)
-					{
-						this.GetComponent<INetworkObject>().ActivatePhysics(false);
+					if (NameConfirmationObject == null)
+					{						
 						string nameObject = (string)parameters[3];
-						NameObject = nameObject;		
+						NameObject = nameObject;
+						NameConfirmationObject = nameObject;		
 						bool dontDestroyOnLoad = (bool)parameters[4];
-						this.transform.position = (Vector3)parameters[5];
-						this.transform.rotation = (Quaternion)parameters[6];
+						// this.transform.position = (Vector3)parameters[5];
+						// this.transform.rotation = (Quaternion)parameters[6];
 						if (dontDestroyOnLoad)
 						{
 							DontDestroyOnLoad(this.gameObject);
 						}
-						SystemEventController.Instance.DelaySystemEvent(EventNetworkObjectIDRefreshTransform, 0.01f, GetViewID(), this.transform.position, this.transform.rotation);
 #if ENABLE_NAKAMA					
 						this.gameObject.GetComponent<NakamaIdentity>().Set(owner, netID, indexPrefab);
 #elif ENABLE_SOCKETS
 						this.gameObject.GetComponent<SocketIdentity>().Set(owner, netID, indexPrefab);
 #endif					
-					}
-					else
-					{
-						this.GetComponent<INetworkObject>().ActivatePhysics(true);
+						SystemEventController.Instance.DispatchSystemEvent(EventNetworkObjectIDStarted, _nameObject, this);
+						// SystemEventController.Instance.DelaySystemEvent(EventNetworkObjectIDRefreshTransform, 0.01f, GetViewID(), this.transform.position, this.transform.rotation);
+						if (this.GetComponent<INetworkObject>() != null)
+						{
+							this.GetComponent<INetworkObject>().ActivatePhysics(true);
+						}
 					}
 				}				
 			}

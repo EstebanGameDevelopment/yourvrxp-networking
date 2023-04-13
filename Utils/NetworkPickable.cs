@@ -70,6 +70,10 @@ namespace yourvrexperience.Networking
 		{
             if (_enabled || force)
             {
+				if (_objectPickable == null)
+				{
+					_objectPickable = this.GetComponent<IObjectPickable>();
+				}
 				_objectPickable.ActivatePhysics(activation);
             }
 		}
