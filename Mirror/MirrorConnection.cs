@@ -95,7 +95,13 @@ namespace yourvrexperience.Networking
 		[Command]
 		public void CmdDestroy(NetworkIdentity target)
 		{
-			GameObject.Destroy(target.gameObject);
+			if (target != null)
+			{
+				if (target.gameObject != null)
+				{
+					GameObject.Destroy(target.gameObject);
+				}				
+			}			
 		}
 
         private void OnSystemEvent(string nameEvent, object[] parameters)
