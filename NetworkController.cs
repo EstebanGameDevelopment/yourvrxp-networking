@@ -192,18 +192,17 @@ namespace yourvrexperience.Networking
 				else
 				{
 #if ENABLE_PHOTON
-                	return PhotonController.Instance.IsServer;
+                	if (PhotonController.Instance!=null) return PhotonController.Instance.IsServer;
 #elif ENABLE_MIRROR
-                	return MirrorController.Instance.IsServer;
+                	if (MirrorController.Instance!=null) return MirrorController.Instance.IsServer;
 #elif ENABLE_NAKAMA
-                	return NakamaController.Instance.IsServer;				
+                	if (NakamaController.Instance!=null) return NakamaController.Instance.IsServer;				
 #elif ENABLE_NETCODE
-                	return NetCodeController.Instance.IsServer;		
+                	if (NetCodeController.Instance!=null) return NetCodeController.Instance.IsServer;		
 #elif ENABLE_SOCKETS
-                	return SocketsController.Instance.IsServer;
-#else
-            		return false;
+                	if (SocketsController.Instance!=null) return SocketsController.Instance.IsServer;
 #endif
+            		return false;
 				}
             }
         }
