@@ -93,7 +93,7 @@ namespace yourvrexperience.Networking
 			{
 				_isInited = true;
 				_hasStartedConnection = true;
-				PhotonNetwork.LocalPlayer.NickName = Utilities.RandomCodeGeneration(UnityEngine.Random.Range(100, 999).ToString());
+				PhotonNetwork.LocalPlayer.NickName = Utilities.RandomCodeGeneration(4) + "_" + UnityEngine.Random.Range(100, 999).ToString();
 				PhotonNetwork.ConnectUsingSettings();
 
 				PhotonNetwork.NetworkingClient.EventReceived += OnPhotonEvent;
