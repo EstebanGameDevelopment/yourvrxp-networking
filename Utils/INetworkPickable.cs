@@ -8,6 +8,7 @@ namespace yourvrexperience.Networking
 {
 	public interface INetworkPickable
 	{
+		GameObject GetGameObject();
 		bool ToggleControl();
 		void RequestAuthority();
 		void ReleaseAuthority();

@@ -32,6 +32,11 @@ namespace yourvrexperience.Networking
 			get { return true; }
 		}
 		
+        public GameObject GetGameObject()
+        {
+            return this.gameObject;
+        }
+
 		protected override void Start()
 		{
 			base.Start();
@@ -143,5 +148,6 @@ namespace yourvrexperience.Networking
 		}
 
 		public virtual void AfterUpdate(){}
+
     }
 }

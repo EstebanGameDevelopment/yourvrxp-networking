@@ -141,7 +141,7 @@ namespace yourvrexperience.Networking
 
 		protected virtual void ReportReleaseConfirmation()
 		{
-			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPrefabObjectReleasedControlConfirmed);
+			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPrefabObjectReleasedControlConfirmed, this.gameObject);
 		}
 
 		public virtual void RequestAuthority()
