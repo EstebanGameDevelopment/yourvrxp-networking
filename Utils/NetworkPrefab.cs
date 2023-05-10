@@ -136,7 +136,7 @@ namespace yourvrexperience.Networking
 
 		protected virtual void ReportedConfirmationOfOwnerShip()
 		{
-			SystemEventController.Instance.DispatchSystemEvent(EventNetworkPrefabTakeControlConfirmation, this.gameObject);
+			SystemEventController.Instance.DelaySystemEvent(EventNetworkPrefabTakeControlConfirmation, 0.01f, this.gameObject);
 		}
 
 		protected virtual void ReportReleaseConfirmation()
