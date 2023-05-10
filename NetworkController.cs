@@ -535,15 +535,15 @@ namespace yourvrexperience.Networking
 			if (!_hasEstablishedConnection) return;
 
 #if ENABLE_PHOTON
-            PhotonController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
+            if (PhotonController.Instance != null) PhotonController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
 #elif ENABLE_MIRROR
-            MirrorController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
+            if (MirrorController.Instance != null) MirrorController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
 #elif ENABLE_NAKAMA
-			NakamaController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
+			if (NakamaController.Instance != null) NakamaController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
 #elif ENABLE_NETCODE
-            NetCodeController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
+            if (NetCodeController.Instance != null) NetCodeController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
 #elif ENABLE_SOCKETS
-			SocketsController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
+			if (SocketsController.Instance != null) SocketsController.Instance.DispatchNetworkEvent(nameEvent, originNetworkID, targetNetworkID, parameters);
 #endif
         }
 
