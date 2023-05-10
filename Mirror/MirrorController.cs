@@ -246,21 +246,30 @@ namespace yourvrexperience.Networking
         {
             string initialData = "";
             string initialTypes = "";
-            NetworkUtils.Serialize(parameters, ref initialData, ref initialTypes);
-            _mirrorConnection.CmdNetworkObject(uniqueNetworkName, prefab, position, owner, initialData, initialTypes);
+			if (_mirrorConnection != null)
+			{
+				NetworkUtils.Serialize(parameters, ref initialData, ref initialTypes);
+				_mirrorConnection.CmdNetworkObject(uniqueNetworkName, prefab, position, owner, initialData, initialTypes);
+			}
         }
 
         public void TakeNetworkAuthority(NetworkIdentity target)
         {
-            _mirrorConnection.CmdAssignNetworkAuthority(target, _mirrorConnection.GetComponent<NetworkIdentity>());
+			if (_mirrorConnection != null)
+			{
+            	_mirrorConnection.CmdAssignNetworkAuthority(target, _mirrorConnection.GetComponent<NetworkIdentity>());
+			}
         }
 
         public void DispatchNetworkEvent(string nameEvent, int originNetworkID, int targetNetworkID, params object[] parameters)
         {
             string types = "";
             string output = "";
-            NetworkUtils.Serialize(parameters, ref output, ref types);
-            _mirrorConnection.CmdMessageFromClientsToServer(nameEvent, originNetworkID, targetNetworkID, output, types);
+			if (_mirrorConnection != null)
+			{
+				NetworkUtils.Serialize(parameters, ref output, ref types);
+				_mirrorConnection.CmdMessageFromClientsToServer(nameEvent, originNetworkID, targetNetworkID, output, types);
+			}            
         }
 
 		private bool StartDiscovery()
