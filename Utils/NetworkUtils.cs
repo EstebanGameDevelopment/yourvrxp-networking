@@ -14,7 +14,12 @@ namespace yourvrexperience.Networking
         {
             for (int i = 0; i < _list.Length; i++)
             {
-                if (_list[i] is int)
+                if (_list[i] is byte)
+                {
+                    _output += ((byte)_list[i]).ToString();
+                    _types += "byte";
+                }
+                else if (_list[i] is int)
                 {
                     _output += ((int)_list[i]).ToString();
                     _types += "int";
@@ -65,7 +70,11 @@ namespace yourvrexperience.Networking
             for (int i = 0; i < data.Length; i++)
             {
                 string type = types[i];
-                if (type.Equals("int"))
+                if (type.Equals("byte"))
+                {
+                    _parameters.Add(byte.Parse(data[i]));
+                }
+                else if (type.Equals("int"))
                 {
                     _parameters.Add(int.Parse(data[i]));
                 }
