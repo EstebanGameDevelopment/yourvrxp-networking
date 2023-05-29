@@ -14,6 +14,7 @@ namespace yourvrexperience.Networking
 		public const string EventNetworkControllerListRoomsUpdated = "EventNetworkControllerListRoomsUpdated";		
 		public const string EventNetworkControllerListRoomsConfirmedUpdated = "EventNetworkControllerListRoomsConfirmedUpdated";		
 		public const string EventNetworkControllerConnectionWithRoom = "EventNetworkControllerConnectionWithRoom";
+		public const string EventNetworkControllerConfirmationConnectionWithRoom = "EventNetworkControllerConfirmationConnectionWithRoom";
 		public const string EventNetworkControllerDestroyCommunications = "EventNetworkControllerDestroyCommunications";
 		public const string EventNetworkControllerPlayerHasBeenDestroyed = "EventNetworkControllerPlayerHasBeenDestroyed";
 		public const string EventNetworkControllerNewPlayerJoinedRoom = "EventNetworkControllerNewPlayerJoinedRoom";
@@ -626,6 +627,7 @@ namespace yourvrexperience.Networking
 				if (!_connections.Contains(uidConnection))
 				{
 					_connections.Add(uidConnection);
+					NetworkController.Instance.DispatchEvent(EventNetworkControllerConfirmationConnectionWithRoom, uidConnection);
 					Utilities.DebugLogColor("++LOCAL++ ADDED ID=" + uidConnection + " AND THE SIZE =" + _connections.Count, Color.red);
 				}
 			}
@@ -635,6 +637,7 @@ namespace yourvrexperience.Networking
 				if (!_connections.Contains(uidConnection))
 				{
 					_connections.Add(uidConnection);
+					NetworkController.Instance.DispatchEvent(EventNetworkControllerConfirmationConnectionWithRoom, uidConnection);
 					if (IsServer)
 					{
 						NetworkController.Instance.DispatchNetworkEvent(EventNetworkControllerReportCurrentState, -1, -1, IsMultipleScene);
