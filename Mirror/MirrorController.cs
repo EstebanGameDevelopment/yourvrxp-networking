@@ -162,7 +162,7 @@ namespace yourvrexperience.Networking
 
 				if (_networkDiscovery != null)
 				{
-					_networkDiscovery.OnServerFound.RemoveListener(OnDiscoveredServer);
+					_networkDiscovery.StopDiscovery();
 				}
 			}			
 		}
