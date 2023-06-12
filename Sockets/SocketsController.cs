@@ -140,6 +140,7 @@ namespace yourvrexperience.Networking
 		{
 			if (_socketConnected)
 			{
+				NetworkController.Instance.DispatchEvent(NetworkController.EventNetworkControllerListRoomsUpdated, _roomsLobby);
 				return;
 			}
 
