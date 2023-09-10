@@ -412,7 +412,7 @@ namespace yourvrexperience.Networking
 		}
 
 		public void RequestAuthority()
-		{
+		{			
 #if ENABLE_MIRROR
 			if (!AmOwner())
 			{
@@ -464,7 +464,13 @@ namespace yourvrexperience.Networking
 			if (nameEvent.Equals(EventNetworkObjectIDRequestData))
 			{
 				int targetNetID = (int)parameters[0];
-				if ((GetViewID() == targetNetID) && AmOwner() && _hasBeenInited)
+				bool isTargetRequest = false;
+#if ENABLE_MIRROR				
+				isTargetRequest = (GetViewID() == targetNetID) && _hasBeenInited;				
+#else
+				isTargetRequest = (GetViewID() == targetNetID) && AmOwner() && _hasBeenInited;
+#endif
+				if (isTargetRequest)
 				{
 #if ENABLE_MIRROR
 					if (this.GetComponent<NetworkTransform>() != null)
@@ -480,7 +486,7 @@ namespace yourvrexperience.Networking
 			if (nameEvent.Equals(EventNetworkObjectIDResponseData))
 			{
 				int targetNetID = (int)parameters[0];
-				if ((GetViewID() == targetNetID) && (!AmOwner()))
+				if ((GetViewID() == targetNetID) && !AmOwner() && !_hasBeenInited)
 				{
 					_hasBeenInited = true;
 					_initialInitializationData = (string)parameters[1];
@@ -603,10 +609,13 @@ namespace yourvrexperience.Networking
 					}
 					else
 					{
-						_requestedTime -= Time.deltaTime;
-						if (_requestedTime <= 0)
+						if (_requestedTime > 0)
 						{
-							_requestedTime = -1;
+							_requestedTime -= Time.deltaTime;
+							if (_requestedTime <= 0)
+							{
+								_requestedTime = -1;
+							}
 						}
 					}					
 				}
