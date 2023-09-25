@@ -521,7 +521,7 @@ namespace yourvrexperience.Networking
 #elif ENABLE_NETCODE
 			NetCodeController.Instance.LoadNewScene(nextScene, previousScene);
 #else
-			if (previousScene.Length > 0) SceneManager.UnloadSceneAsync(previousScene);
+			if ((previousScene != null) && (previousScene.Length > 0)) SceneManager.UnloadSceneAsync(previousScene);
 			SceneManager.LoadScene(nextScene, LoadSceneMode.Additive);
 #endif
 		}
