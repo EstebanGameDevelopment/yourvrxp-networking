@@ -30,7 +30,7 @@ namespace yourvrexperience.Networking
 #endif	
     {
 #if ENABLE_MIRROR		
-		public const bool DebugMessages = false;
+		public const bool DebugMessages = true;
 
 		public const string EventMirrorNetworkAvatarInited = "EventMirrorNetworkAvatarInited";
         public const string EventMirrorNetworkLocalConnection = "EventMirrorNetworkLocalConnection";
@@ -272,11 +272,20 @@ namespace yourvrexperience.Networking
 			}            
         }
 
-		private bool StartDiscovery()
+		private bool StartDiscovery(string nameRoom)
 		{
 			if (_networkDiscovery == null)
             {
                 _networkDiscovery = GetComponent<NetworkDiscovery>();
+				if ((nameRoom != null) && (nameRoom.Length > 0))
+				{
+					MirrorCustomDiscovery customDiscover = GetComponent<MirrorCustomDiscovery>();
+					if (customDiscover != null)
+					{
+						int finalPort = Utilities.StringToHash(nameRoom, 40000);
+						customDiscover.SetUpDiscoveryPort(finalPort);
+					}					
+				}				
 				if (_networkDiscovery != null)
 				{
 					_networkDiscovery.OnServerFound.AddListener(OnDiscoveredServer);
@@ -302,7 +311,7 @@ namespace yourvrexperience.Networking
 
 		public void CreateRoom(string nameRoom, int totalNumberOfPlayers)
         {
-			if (!StartDiscovery())
+			if (!StartDiscovery(nameRoom))
 			{
 				_discovering = false;
                 _isServer = true;
@@ -314,7 +323,7 @@ namespace yourvrexperience.Networking
 
         public void JoinRoom(string room)
         {
-			if (!StartDiscovery())
+			if (!StartDiscovery(room))
 			{                
 				_discovering = false;
                 _isServer = false;
