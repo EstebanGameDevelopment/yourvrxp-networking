@@ -6,7 +6,7 @@ using yourvrexperience.Utils;
 #if ENABLE_MIRROR
 using Mirror;
 #endif
-#if (ENABLE_OCULUS || ENABLE_OPENXR || ENABLE_ULTIMATEXR)
+#if (ENABLE_OCULUS || ENABLE_OPENXR || ENABLE_ULTIMATEXR || ENABLE_NREAL)
 using yourvrexperience.VR;
 #endif
 #if ENABLE_ULTIMATEXR
