@@ -259,7 +259,7 @@ namespace yourvrexperience.Networking
 			if (this.GetComponent<PhotonTransformView>() != null) this.GetComponent<PhotonTransformView>().enabled = false;
 #elif ENABLE_MIRROR
             if (this.GetComponent<NetworkIdentity>() != null) this.GetComponent<NetworkIdentity>().enabled = false;
-			if (this.GetComponent<NetworkTransform>() != null) this.GetComponent<NetworkTransform>().enabled = false;
+			if (this.GetComponent<NetworkTransformUnreliable>() != null) this.GetComponent<NetworkTransformUnreliable>().enabled = false;
 #elif ENABLE_NAKAMA
             if (this.GetComponent<NakamaIdentity>() != null) this.GetComponent<NakamaIdentity>().enabled = false;
 			if (this.GetComponent<NakamaTransform>() != null) this.GetComponent<NakamaTransform>().enabled = false;
@@ -473,11 +473,11 @@ namespace yourvrexperience.Networking
 				if (isTargetRequest)
 				{
 #if ENABLE_MIRROR
-					if (this.GetComponent<NetworkTransform>() != null)
+					if (this.GetComponent<NetworkTransformUnreliable>() != null)
 					{
 						// SetDirty() doesn't work, so we change the position in order to update the network transform
 						// this.transform.position += new Vector3(0.01f,0.01f,0.01f);
-						this.GetComponent<NetworkTransform>().SetDirty();
+						this.GetComponent<NetworkTransformUnreliable>().SetDirty();
 					}
 #endif
 					NetworkController.Instance.DispatchNetworkEvent(EventNetworkObjectIDResponseData, -1, -1, GetViewID(), _initialInitializationData);
@@ -498,9 +498,9 @@ namespace yourvrexperience.Networking
 				if (AmOwner())	
 				{
 #if ENABLE_MIRROR					
-					if (this.GetComponent<NetworkTransform>() != null)
+					if (this.GetComponent<NetworkTransformUnreliable>() != null)
 					{
-						this.GetComponent<NetworkTransform>().SetDirty();
+						this.GetComponent<NetworkTransformUnreliable>().SetDirty();
 					}
 #endif					
 				}
