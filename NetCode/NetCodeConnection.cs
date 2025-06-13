@@ -60,7 +60,7 @@ namespace yourvrexperience.Networking
 			networkGO.GetComponent<NetworkObjectID>().OwnerID = new NetworkVariable<int>(owner);
 			networkGO.GetComponent<NetworkObjectID>().NameObject = uniqueNetworkName;
 			networkGO.GetComponent<NetworkObject>().SpawnWithOwnership((ulong)owner);
-			Utilities.FixObject(networkGO);
+			yourvrexperience.Utils.Utilities.FixObject(networkGO);
 			if (NetworkController.Instance.IsMultipleScene) DontDestroyOnLoad(networkGO);
 			NetCodeController.Instance.InstanceCounter++;
 		}

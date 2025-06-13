@@ -295,7 +295,7 @@ namespace yourvrexperience.Networking
 			{
 				DontDestroyOnLoad(newNetworkGO);
 			}
-			Utilities.FixObject(newNetworkGO);
+			yourvrexperience.Utils.Utilities.FixObject(newNetworkGO);
 			newNetworkGO.GetComponent<SocketIdentity>().Set(ownerNetID, uniqueNetworkID, indexPrefab);
 	      	return newNetworkGO;
         }

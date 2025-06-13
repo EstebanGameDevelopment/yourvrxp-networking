@@ -282,7 +282,7 @@ namespace yourvrexperience.Networking
 					MirrorCustomDiscovery customDiscover = GetComponent<MirrorCustomDiscovery>();
 					if (customDiscover != null)
 					{
-						int finalPort = Utilities.StringToHash(nameRoom, 40000);
+						int finalPort = yourvrexperience.Utils.Utilities.StringToHash(nameRoom, 40000);
 						customDiscover.SetUpDiscoveryPort(finalPort);
 					}					
 				}				

@@ -78,9 +78,9 @@ namespace yourvrexperience.Networking
 				{ OwnerKey, owner.ToString() },
 				{ UidKey, uid.ToString() },
 				{ IndexKey, index.ToString() },
-				{ PositionKey, Utilities.SerializeVector3(position) },
-				{ RotationKey, Utilities.SerializeQuaternion(rotation) },
-				{ ScaleKey, Utilities.SerializeVector3(scale) }
+				{ PositionKey, yourvrexperience.Utils.Utilities.SerializeVector3(position) },
+				{ RotationKey, yourvrexperience.Utils.Utilities.SerializeQuaternion(rotation) },
+				{ ScaleKey, yourvrexperience.Utils.Utilities.SerializeVector3(scale) }
 			};
 
 			return values.ToJson();

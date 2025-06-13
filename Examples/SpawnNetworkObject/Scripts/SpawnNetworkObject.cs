@@ -66,10 +66,10 @@ namespace yourvrexperience.Networking
 			{
 				int bulletID = (int)parameters[0];
 				int playerOwnerBullet = (int)parameters[1];
-				Color colorBullet = Utilities.UnpackColor((string)parameters[2]);
-				Vector3 localPositionBullet = Utilities.DeserializeVector3((string)parameters[3]);
-				Vector3 worldPositionBullet = Utilities.DeserializeVector3((string)parameters[4]);
-				Vector3 targetMouse = Utilities.DeserializeVector3((string)parameters[5]);
+				Color colorBullet = yourvrexperience.Utils.Utilities.UnpackColor((string)parameters[2]);
+				Vector3 localPositionBullet = yourvrexperience.Utils.Utilities.DeserializeVector3((string)parameters[3]);
+				Vector3 worldPositionBullet = yourvrexperience.Utils.Utilities.DeserializeVector3((string)parameters[4]);
+				Vector3 targetMouse = yourvrexperience.Utils.Utilities.DeserializeVector3((string)parameters[5]);
 				Vector2 realTargetMouse = Vector2.zero;
 				RectTransformUtility.ScreenPointToLocalPointInRectangle(UserArea, targetMouse, null, out realTargetMouse);
 				Vector2 forwardBullet = new Vector2(realTargetMouse.x, realTargetMouse.y) - new Vector2(localPositionBullet.x, localPositionBullet.y);

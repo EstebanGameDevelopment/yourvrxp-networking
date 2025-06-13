@@ -93,7 +93,7 @@ namespace yourvrexperience.Networking
 			{
 				_isInited = true;
 				_hasStartedConnection = true;
-				PhotonNetwork.LocalPlayer.NickName = Utilities.RandomCodeGeneration(4) + "_" + UnityEngine.Random.Range(100, 999).ToString();
+				PhotonNetwork.LocalPlayer.NickName = yourvrexperience.Utils.Utilities.RandomCodeGeneration(4) + "_" + UnityEngine.Random.Range(100, 999).ToString();
 				PhotonNetwork.ConnectUsingSettings();
 
 				PhotonNetwork.NetworkingClient.EventReceived += OnPhotonEvent;
@@ -177,7 +177,7 @@ namespace yourvrexperience.Networking
 
         public override void OnConnectedToMaster()
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnLeftLobby", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnLeftLobby", Color.red);
             _isConnected = true;
             GetListRooms();
         }
@@ -187,14 +187,14 @@ namespace yourvrexperience.Networking
             if (!PhotonNetwork.InLobby)
             {
                 PhotonNetwork.JoinLobby();
-                if (DebugMessages) Utilities.DebugLogColor("PhotonController::GetListRooms:REQUEST TO JOIN THE LOBBY", Color.red);
+                if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::GetListRooms:REQUEST TO JOIN THE LOBBY", Color.red);
             }
         }
 
         public override void OnRoomListUpdate(List<RoomInfo> roomList)
         {
 			_isInLobby = true;
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnRoomListUpdate:roomList.Count[" + roomList.Count + "]", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnRoomListUpdate:roomList.Count[" + roomList.Count + "]", Color.red);
             _roomsLobby.Clear();
             for (int i = 0; i < roomList.Count; i++)
             {
@@ -204,7 +204,7 @@ namespace yourvrexperience.Networking
             }
 			NetworkController.Instance.DispatchEvent(NetworkController.EventNetworkControllerListRoomsUpdated, _roomsLobby);
 
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnRoomListUpdate::REPORTING LIST OF ROOMS[" + _roomsLobby.Count + "]", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnRoomListUpdate::REPORTING LIST OF ROOMS[" + _roomsLobby.Count + "]", Color.red);
         }
 
         public void CreateRoom(string nameRoom, int totalNumberOfPlayers)
@@ -214,7 +214,7 @@ namespace yourvrexperience.Networking
                 _totalNumberOfPlayers = totalNumberOfPlayers;
                 RoomOptions options = new RoomOptions { MaxPlayers = (byte)_totalNumberOfPlayers, PlayerTtl = 10000 };
                 PhotonNetwork.CreateRoom(nameRoom, options, null);
-                if (DebugMessages) Utilities.DebugLogColor("PhotonController::CreateRoom::CREATING THE ROOM...", Color.red);
+                if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::CreateRoom::CREATING THE ROOM...", Color.red);
             }
         }
 
@@ -228,23 +228,23 @@ namespace yourvrexperience.Networking
                     PhotonNetwork.LeaveLobby();
                 }
                 PhotonNetwork.JoinRoom(room);
-                if (DebugMessages) Utilities.DebugLogColor("PhotonController::JoinRoom::JOINING THE ROOM....", Color.red);
+                if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::JoinRoom::JOINING THE ROOM....", Color.red);
             }
         }
 
         public override void OnLeftLobby()
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnLeftLobby", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnLeftLobby", Color.red);
         }
 
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnCreateRoomFailed", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnCreateRoomFailed", Color.red);
         }
 
         public override void OnJoinRoomFailed(short returnCode, string message)
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnJoinRoomFailed", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnJoinRoomFailed", Color.red);
         }
 
         public override void OnJoinedRoom()
@@ -255,36 +255,36 @@ namespace yourvrexperience.Networking
 				_isInRoom = true;
 				_isInLobby = false;
                 NetworkController.Instance.DispatchEvent(NetworkController.EventNetworkControllerConnectionWithRoom, _uniqueNetworkID);
-                if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnJoinedRoom::UniqueNetworkID[" + UniqueNetworkID + "]::MasterClient[" + PhotonNetwork.IsMasterClient + "]", Color.red);
+                if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnJoinedRoom::UniqueNetworkID[" + UniqueNetworkID + "]::MasterClient[" + PhotonNetwork.IsMasterClient + "]", Color.red);
             }
         }
 
         public override void OnLeftRoom()
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnLeftRoom", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnLeftRoom", Color.red);
         }
 
         public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)
         {
             int otherNetworkID = newPlayer.ActorNumber;
 			NetworkController.Instance.DispatchEvent(NetworkController.EventNetworkControllerNewPlayerJoinedRoom, otherNetworkID);
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnPlayerEnteredRoom::otherNetworkID[" + otherNetworkID + "]", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnPlayerEnteredRoom::otherNetworkID[" + otherNetworkID + "]", Color.red);
         }
 
         public override void OnPlayerLeftRoom(Photon.Realtime.Player otherPlayer)
         {
 			NetworkController.Instance.DispatchEvent(NetworkController.EventNetworkControllerPlayerDisconnected, otherPlayer.ActorNumber);
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnPlayerLeftRoom", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnPlayerLeftRoom", Color.red);
         }
 
         public override void OnMasterClientSwitched(Photon.Realtime.Player newMasterClient)
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnMasterClientSwitched", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnMasterClientSwitched", Color.red);
         }
 
         public override void OnPlayerPropertiesUpdate(Photon.Realtime.Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
         {
-            if (DebugMessages) Utilities.DebugLogColor("PhotonController::OnPlayerPropertiesUpdate", Color.red);
+            if (DebugMessages) yourvrexperience.Utils.Utilities.DebugLogColor("PhotonController::OnPlayerPropertiesUpdate", Color.red);
         }
 
         public GameObject CreateNetworkPrefab(bool _dontDestroyOnLoad, string uniqueNetworkName, GameObject prefab, string pathToPrefab, Vector3 position, Quaternion rotation, byte data, params object[] parameters)
@@ -301,7 +301,7 @@ namespace yourvrexperience.Networking
             networkInstance.name = uniqueNetworkName;
 			networkInstance.GetComponent<NetworkObjectID>().NameObject = uniqueNetworkName;		
             NetworkController.Instance.DelayNetworkEvent(NetworkObjectID.EventNetworkObjectIDIdentity, 0.2f, -1, -1, networkInstance.GetComponent<NetworkObjectID>().GetOwnerID(), networkInstance.GetComponent<NetworkObjectID>().GetViewID(), networkInstance.GetComponent<NetworkObjectID>().GetIndexPrefab(), networkInstance.GetComponent<NetworkObjectID>().NameObject, NetworkController.Instance.IsMultipleScene, this.transform.position, this.transform.rotation);	
-            Utilities.FixObject(networkInstance);
+            yourvrexperience.Utils.Utilities.FixObject(networkInstance);
 			if (_dontDestroyOnLoad)
 			{
 				DontDestroyOnLoad(networkInstance);

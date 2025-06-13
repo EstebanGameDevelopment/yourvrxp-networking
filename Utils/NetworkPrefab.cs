@@ -89,18 +89,18 @@ namespace yourvrexperience.Networking
 
 		public virtual string GetInitialData()
 		{
-			string output = Utilities.SerializeVector3(this.transform.position) + Separator + 
-					Utilities.SerializeQuaternion(this.transform.rotation) + Separator + 
-					Utilities.SerializeVector3(this.transform.localScale);
+			string output = yourvrexperience.Utils.Utilities.SerializeVector3(this.transform.position) + Separator + 
+					yourvrexperience.Utils.Utilities.SerializeQuaternion(this.transform.rotation) + Separator + 
+					yourvrexperience.Utils.Utilities.SerializeVector3(this.transform.localScale);
 			return output;
 		}
 
 		public virtual void ApplyInitialData(string data, bool linkedToLevel)
 		{
 			string[] dataArray = data.Split(Separator, StringSplitOptions.None);
-			this.transform.position = Utilities.DeserializeVector3(dataArray[0]);
-			this.transform.rotation = Utilities.DeserializeQuaternion(dataArray[1]);
-			this.transform.localScale = Utilities.DeserializeVector3(dataArray[2]);
+			this.transform.position = yourvrexperience.Utils.Utilities.DeserializeVector3(dataArray[0]);
+			this.transform.rotation = yourvrexperience.Utils.Utilities.DeserializeQuaternion(dataArray[1]);
+			this.transform.localScale = yourvrexperience.Utils.Utilities.DeserializeVector3(dataArray[2]);
 			NetworkGameIDView.LinkedToCurrentLevel = linkedToLevel;	
 		}
 

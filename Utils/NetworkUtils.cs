@@ -41,17 +41,17 @@ namespace yourvrexperience.Networking
                 }
                 else if (_list[i] is Vector3)
                 {
-                    _output += Utilities.SerializeVector3((Vector3)_list[i]);
+                    _output += yourvrexperience.Utils.Utilities.SerializeVector3((Vector3)_list[i]);
                     _types += "Vector3";
                 }
                 else if (_list[i] is Vector2)
                 {
-                    _output += Utilities.SerializeVector3((Vector2)_list[i]);
+                    _output += yourvrexperience.Utils.Utilities.SerializeVector3((Vector2)_list[i]);
                     _types += "Vector2";
                 }
 				else if (_list[i] is Quaternion)
                 {
-                    _output += Utilities.SerializeQuaternion((Quaternion)_list[i]);
+                    _output += yourvrexperience.Utils.Utilities.SerializeQuaternion((Quaternion)_list[i]);
                     _types += "Quaternion";
                 }
                 if (i + 1 < _list.Length)
@@ -92,15 +92,15 @@ namespace yourvrexperience.Networking
                 }
                 else if (type.Equals("Vector3"))
                 {
-                    _parameters.Add(Utilities.DeserializeVector3(data[i]));
+                    _parameters.Add(yourvrexperience.Utils.Utilities.DeserializeVector3(data[i]));
                 }
 				else if (type.Equals("Vector2"))
                 {
-                    _parameters.Add(Utilities.DeserializeVector2(data[i]));
+                    _parameters.Add(yourvrexperience.Utils.Utilities.DeserializeVector2(data[i]));
                 }
 				else if (type.Equals("Quaternion"))
                 {
-                    _parameters.Add(Utilities.DeserializeQuaternion(data[i]));
+                    _parameters.Add(yourvrexperience.Utils.Utilities.DeserializeQuaternion(data[i]));
                 }				
             }
         }

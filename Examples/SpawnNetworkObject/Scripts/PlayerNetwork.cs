@@ -60,7 +60,7 @@ namespace yourvrexperience.Networking
 			set {
 				_color = value;
 				Background.color = _color;
-				SetInitData(Utilities.PackColor(_color));
+				SetInitData(yourvrexperience.Utils.Utilities.PackColor(_color));
 			}
 		}
 
@@ -103,7 +103,7 @@ namespace yourvrexperience.Networking
 
 		public void OnInitDataEvent(string initializationData)
 		{
-			PlayerColor = Utilities.UnpackColor(initializationData);
+			PlayerColor = yourvrexperience.Utils.Utilities.UnpackColor(initializationData);
 			NetIdentification.text = NetworkGameIDView.GetViewID().ToString();
 			if (NetLife != null) NetLife.text = _life.ToString();
 			_content.gameObject.SetActive(true);
@@ -161,10 +161,10 @@ namespace yourvrexperience.Networking
 					if (Input.GetMouseButtonDown(0))
 					{
 						Vector3 target = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 0);
-						string packedLocalPosition = Utilities.SerializeVector3(this.GetComponent<RectTransform>().anchoredPosition);
-						string packedWorldPosition = Utilities.SerializeVector3(this.transform.position);
-						string packedTargetPosition = Utilities.SerializeVector3(target);
-						NetworkController.Instance.DispatchNetworkEvent(EventPlayerNetworkAskBullet, -1, -1, NetworkController.Instance.UniqueNetworkID, Utilities.PackColor(_color), packedLocalPosition, packedWorldPosition, packedTargetPosition);
+						string packedLocalPosition = yourvrexperience.Utils.Utilities.SerializeVector3(this.GetComponent<RectTransform>().anchoredPosition);
+						string packedWorldPosition = yourvrexperience.Utils.Utilities.SerializeVector3(this.transform.position);
+						string packedTargetPosition = yourvrexperience.Utils.Utilities.SerializeVector3(target);
+						NetworkController.Instance.DispatchNetworkEvent(EventPlayerNetworkAskBullet, -1, -1, NetworkController.Instance.UniqueNetworkID, yourvrexperience.Utils.Utilities.PackColor(_color), packedLocalPosition, packedWorldPosition, packedTargetPosition);
 					}
 				}
 			}

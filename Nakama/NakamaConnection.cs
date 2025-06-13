@@ -67,7 +67,7 @@ namespace yourvrexperience.Networking
 				string deviceId;
 
 #if UNITY_EDITOR
-				deviceId = Utilities.RandomCodeGeneration("user_" + Utilities.GetTimestamp());
+				deviceId = yourvrexperience.Utils.Utilities.RandomCodeGeneration("user_" + yourvrexperience.Utils.Utilities.GetTimestamp());
 #else
 				if (PlayerPrefs.HasKey(DeviceIdentifierPrefName))
 				{

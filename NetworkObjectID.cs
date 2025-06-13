@@ -6,7 +6,7 @@ using Mirror;
 #endif
 #if ENABLE_NETCODE
 using Unity.Netcode;
-using Unity.Multiplayer.Samples.Utilities.ClientAuthority;
+using Unity.Multiplayer.Samples.yourvrexperience.Utils.Utilities.ClientAuthority;
 #endif
 using UnityEngine;
 using System.Collections;

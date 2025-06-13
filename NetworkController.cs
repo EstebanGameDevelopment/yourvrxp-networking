@@ -628,7 +628,7 @@ namespace yourvrexperience.Networking
 				{
 					_connections.Add(uidConnection);
 					NetworkController.Instance.DispatchEvent(EventNetworkControllerConfirmationConnectionWithRoom, uidConnection);
-					Utilities.DebugLogColor("++LOCAL++ ADDED ID=" + uidConnection + " AND THE SIZE =" + _connections.Count, Color.red);
+					yourvrexperience.Utils.Utilities.DebugLogColor("++LOCAL++ ADDED ID=" + uidConnection + " AND THE SIZE =" + _connections.Count, Color.red);
 				}
 			}
 			if (nameEvent.Equals(EventNetworkControllerNewPlayerJoinedRoom))
@@ -642,7 +642,7 @@ namespace yourvrexperience.Networking
 					{
 						NetworkController.Instance.DispatchNetworkEvent(EventNetworkControllerReportCurrentState, -1, -1, IsMultipleScene);
 					}					
-					Utilities.DebugLogColor("++REMOTE++ ADDED ID=" + uidConnection + " AND THE SIZE =" + _connections.Count, Color.red);
+					yourvrexperience.Utils.Utilities.DebugLogColor("++REMOTE++ ADDED ID=" + uidConnection + " AND THE SIZE =" + _connections.Count, Color.red);
 				}
 			}			
 			if (nameEvent.Equals(EventNetworkControllerReportCurrentState))
@@ -657,7 +657,7 @@ namespace yourvrexperience.Networking
 				int uidConnection = (int)parameters[0];
 				if (_connections.Remove(uidConnection))
 				{
-					Utilities.DebugLogColor("REMOVED ID=" + uidConnection + " _connections AFTER THAT =" + _connections.Count, Color.red);
+					yourvrexperience.Utils.Utilities.DebugLogColor("REMOVED ID=" + uidConnection + " _connections AFTER THAT =" + _connections.Count, Color.red);
 				}
 			}
 			if (nameEvent.Equals(EventNetworkControllerResetInitialIndexPosition))

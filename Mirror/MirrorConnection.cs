@@ -66,7 +66,7 @@ namespace yourvrexperience.Networking
 			networkGO.GetComponent<NetworkObjectID>().Owner = owner;
 			networkGO.GetComponent<NetworkObjectID>().InstanceID = MirrorController.Instance.InstanceCounter;
 			networkGO.GetComponent<NetworkObjectID>().NameObject = uniqueNetworkName;
-			Utilities.FixObject(networkGO);
+			yourvrexperience.Utils.Utilities.FixObject(networkGO);
 			if (NetworkController.Instance.IsMultipleScene) DontDestroyOnLoad(networkGO);
 			MirrorController.Instance.InstanceCounter++;
 			NetworkServer.Spawn(networkGO);

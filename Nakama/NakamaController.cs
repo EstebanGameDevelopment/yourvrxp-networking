@@ -489,7 +489,7 @@ namespace yourvrexperience.Networking
 					state.TryGetValue(MatchDataJson.ScaleKey, out scale);
 
 					// Debug.LogError("+++++++++++++++++++TRANSFORM RECEIVED::netid[" + netid + "]::uid["+ uid + "]::indexPrefab["+ indexPrefab +"]");
-					DispatchTransformEvent(int.Parse(owner), int.Parse(uid), int.Parse(indexPrefab), Utilities.DeserializeVector3(position), Utilities.DeserializeQuaternion(rotation), Utilities.DeserializeVector3(scale));
+					DispatchTransformEvent(int.Parse(owner), int.Parse(uid), int.Parse(indexPrefab), yourvrexperience.Utils.Utilities.DeserializeVector3(position), yourvrexperience.Utils.Utilities.DeserializeQuaternion(rotation), yourvrexperience.Utils.Utilities.DeserializeVector3(scale));
 					break;
 
 				default:
@@ -769,7 +769,7 @@ namespace yourvrexperience.Networking
 			{
 				DontDestroyOnLoad(newNetworkGO);
 			}
-			Utilities.FixObject(newNetworkGO);
+			yourvrexperience.Utils.Utilities.FixObject(newNetworkGO);
 			newNetworkGO.GetComponent<NakamaIdentity>().Set(ownerNetID, uniqueNetworkID, indexPrefab);
 	      	return newNetworkGO;
         }
