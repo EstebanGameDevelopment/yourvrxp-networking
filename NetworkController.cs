@@ -531,6 +531,15 @@ namespace yourvrexperience.Networking
 			if (previousScene.Length > 0) SceneManager.UnloadSceneAsync(previousScene);
 		}
 
+		public bool ExistNameRoom(string nameRoom)
+        {
+			foreach(RoomData room in _roomsLobby)
+            {
+				if (room.NameRoom.Equals(nameRoom)) return true;
+            }
+			return false;
+        }
+
         public void DispatchNetworkEvent(string nameEvent, int originNetworkID, int targetNetworkID, params object[] parameters)
         {
 			if (!_hasEstablishedConnection) return;
